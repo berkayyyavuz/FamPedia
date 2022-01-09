@@ -1,51 +1,85 @@
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.LinkedList;
 
+ /** linkedlist by using objects (ece) vs linkedlist triple (kadir)*/
 public class Tree {
-    int ID;
-    String name;
-    Date creationDate;
-    ArrayList <Member> listOfMember;
+    private Member root;
+    private LinkedList<Member> sortedlist;
+    private ArrayList<Integer> generationCount;
 
-    public Tree(int ID, String name, Date creationDate, ArrayList<Member> listOfMember) {
-        this.ID = ID;
-        this.name = name;
-        this.creationDate = creationDate;
-        this.listOfMember = listOfMember;
+
+    public Tree(Member ancient) {
+        root = ancient;
+        generationCount = new ArrayList<>();
     }
 
-    public Tree() {
+   /* public void insert(Member father, Member mother, Member newMember) {
+
+            resort(newMember);
+        }*/
+
+        // need to improve
+    public void resort(Member newMember){
+        boolean flag = false;
+        sortedlist = new LinkedList<>();
+        for (int i = 0; i < sortedlist.size()-1; i++) {
+            if (newMember.compareTo(sortedlist.get(i))>=0 && newMember.compareTo(sortedlist.get(i+1))<0){
+                sortedlist.add(i+1,newMember);
+                flag =true;
+                break;
+            }
+        }
+        if (sortedlist.size()>0){
+            if (newMember.compareTo(sortedlist.get(0))<0){
+                sortedlist.add(0,newMember);
+                flag=true;
+            }
+        }
+        if (!flag)
+            sortedlist.add(sortedlist.size(),newMember);
+
     }
 
-    public int getID() {
-        return ID;
+    public Member getRoot() {
+        return root;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setRoot(Member root) {
+        this.root = root;
     }
 
-    public String getName() {
-        return name;
+    public LinkedList<Member> getSortedlist() {
+        return sortedlist;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSortedlist(LinkedList<Member> sortedlist) {
+        this.sortedlist = sortedlist;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public ArrayList<Integer> getGenerationCount() {
+        return generationCount;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setGenerationCount(ArrayList<Integer> generationCount) {
+        this.generationCount = generationCount;
     }
 
-    public ArrayList<Member> getListOfMember() {
-        return listOfMember;
-    }
+    /** sinan we need your algorithm methods here */
+    @Override
+    public String toString() {
 
-    public void setListOfMember(ArrayList<Member> listOfMember) {
-        this.listOfMember = listOfMember;
+        String result = "";
+        int count = getRoot().getGeneration();
+
+        for (int j = 0; j < generationCount.size(); j++){
+            for (int i = 0; i < getSortedlist().size(); i++) {
+                if (sortedlist.get(i).getGeneration() == count) {
+                    result += getSortedlist().get(i).getName() + "\t";
+                }
+                count++;
+                System.out.println();
+            }
+    }
+            return "Tree:\n " + result;
     }
 }
