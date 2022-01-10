@@ -1,10 +1,9 @@
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Member implements Serializable, Comparable{
+public class Member{
     private String name;
-    private int[] birthday;//year/month/day
-    private int[] deathday;//year/month/day
+    private int birthYear; //year
+    private int deathYear; //year
     private GenderType gender;//female male unknown
     private MarriageState isMarried;//unmarried married unknown
     private LiveState isAlive;//died alive unknown
@@ -13,17 +12,19 @@ public class Member implements Serializable, Comparable{
     private Member father;
     private Member mother;
     private ArrayList<Member> members;
+    static int generationCount = 0;
 
     private Member amca;
     private Member hala;
-//
-    public Member(String name, int birthYear, int birthMonth, int birthDay,
-                  int deathYear, int deathMonth, int deathDay,
+    private Member spouse;
+    private Member child;
+
+    public Member(String name, int birthYear, int deathYear,
                   GenderType gender, MarriageState isMarried, LiveState isAlive,
                   Member father, Member mother) {
         this.name = name;
-        setBirthday(birthYear, birthMonth, birthDay);
-        setDeathday(deathYear, deathMonth, deathDay);
+        this.birthYear = birthYear;
+        this.deathYear = deathYear;
         this.gender = gender;
         this.isMarried = isMarried;
         this.isAlive = isAlive;
@@ -34,12 +35,14 @@ public class Member implements Serializable, Comparable{
 
         this.father = father;
         this.mother = mother;
+
+        generationCount = getGeneration();
     }
 
     public Member() {
          name = "";
-         birthday = new int[3];
-         deathday = new int[3];
+         birthYear = 0;
+         deathYear = 0;
          gender = GenderType.unknown;
          isMarried = MarriageState.unknown;
          isAlive = LiveState.unknown;
@@ -47,6 +50,23 @@ public class Member implements Serializable, Comparable{
          father = null;
          mother = null;
          members = new ArrayList<>();
+    }
+
+    public Member getSpouse() {
+        return spouse;
+    }
+
+    public void setSpouse(Member spouse) {
+        spouse.setGeneration(this.getGeneration());
+        this.spouse = spouse;
+    }
+
+    public Member getChild() {
+        return child;
+    }
+
+    public void setChild(Member child) {
+        this.child = child;
     }
 
     public Member getAmca() {
@@ -65,33 +85,12 @@ public class Member implements Serializable, Comparable{
         this.hala = hala;
     }
 
-    public void setBirthday(int year, int month, int day) {
-        birthday = new int[3];
-        this.birthday[0] = year;
-        this.birthday[1] = month;
-        this.birthday[2] = day;
-    }
-    public void setDeathday(int year, int month, int day) {
-        deathday = new int[3];
-        this.deathday[0] = year;
-        this.deathday[1] = month;
-        this.deathday[2] = day;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int[] getBirthday() {
-        return birthday;
-    }
-
-    public int[] getDeathday() {
-        return deathday;
     }
 
     public GenderType getGender() {
@@ -150,21 +149,20 @@ public class Member implements Serializable, Comparable{
         this.members = members;
     }
 
-    @Override
-    //compare birthday
-    public int compareTo(Object o) {
-        Member other = (Member)o;
-        if (this.birthday[0]>other.birthday[0])
-            return 1;
-        else if (this.birthday[0]==other.birthday[0])
-            if (this.birthday[1]>other.birthday[1])
-                return 1;
-            else if (this.birthday[1]==other.birthday[1])
-                if (this.birthday[2] >other.birthday[2])
-                    return 1;
-                else if (this.birthday[2] ==other.birthday[2])
-                    return 0;
-        return -1;
+    public int getBirthYear() {
+        return birthYear;
+    }
+
+    public void setBirthYear(int birthYear) {
+        this.birthYear = birthYear;
+    }
+
+    public int getDeathYear() {
+        return deathYear;
+    }
+
+    public void setDeathYear(int deathYear) {
+        this.deathYear = deathYear;
     }
 }
 enum GenderType {male,female,unknown}
