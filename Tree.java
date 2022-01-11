@@ -62,9 +62,12 @@ public class Tree {
      }
 
      public void setChild(Member member){
+
         if(member.getMother() != null && member.getFather() != null){
             member.getMother().setChild(member);
+            member.getMother().getChildren().add(member.getName());
             member.getFather().setChild(member);
+            member.getFather().getChildren().add(member.getName());
         }
      }
 
@@ -92,6 +95,32 @@ public class Tree {
         this.generationCount = generationCount;
     }
 
+//new method
+    public int getGenerationSize(int generation){
+        int count = 0;
+        for(int i=0;i< sortedlist.size();i++) {
+            if (sortedlist.get(i).getGeneration() == generation)
+                count++;
+        }
+        return count;
+    }
+
+    public void searchParent(String fatherName, String motherName,  Member member){
+        for(int i=0;i< sortedlist.size();i++) {
+            switch (getSortedlist().get(i).getGender()) {
+                case male:
+                    if (getSortedlist().get(i).getName().equals(fatherName) && getSortedlist().get(i).getGeneration() < member.getGeneration())
+                        member.setFather(getSortedlist().get(i));
+                    break;
+                case female:
+                    if (getSortedlist().get(i).getName().equals(motherName) && getSortedlist().get(i).getGeneration() < member.getGeneration())
+                        member.setMother(getSortedlist().get(i));
+                    break;
+                case unknown:
+            }
+
+        }
+    }
     @Override
     public String toString() {
 

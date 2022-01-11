@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Member{
     private String name;
@@ -18,6 +19,7 @@ public class Member{
     private Member hala;
     private Member spouse;
     private Member child;
+    private LinkedList<String> children; //new
 
     public Member(String name, int birthYear, int deathYear,
                   GenderType gender, MarriageState isMarried, LiveState isAlive,
@@ -35,6 +37,7 @@ public class Member{
 
         this.father = father;
         this.mother = mother;
+        children = new LinkedList<>();
 
         generationCount = getGeneration();
     }
@@ -46,10 +49,21 @@ public class Member{
          gender = GenderType.unknown;
          isMarried = MarriageState.unknown;
          isAlive = LiveState.unknown;
-         generation = 0;
+        if(father != null)
+            this.generation = father.getGeneration()+1;
+        else generation = 1;
          father = null;
          mother = null;
          members = new ArrayList<>();
+         children = new LinkedList<>();
+    }
+
+    public LinkedList<String> getChildren() {
+        return children;
+    }
+
+    public void setChildren(LinkedList<String> children) {
+        this.children = children;
     }
 
     public Member getSpouse() {
@@ -163,6 +177,21 @@ public class Member{
 
     public void setDeathYear(int deathYear) {
         this.deathYear = deathYear;
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "name='" + name + '\'' +
+                ", birthYear=" + birthYear +
+                ", deathYear=" + deathYear +
+                ", gender=" + gender +
+                ", isMarried=" + isMarried +
+                ", isAlive=" + isAlive +
+                ", generation=" + generation +
+                ", father=" + father +
+                ", mother=" + mother +
+                '}';
     }
 }
 enum GenderType {male,female,unknown}
