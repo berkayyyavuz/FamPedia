@@ -205,6 +205,13 @@ public class Relation {
         return found;
     }
 
+    public static void listAllRelations(Member current) {
+        Relation.listAunts(current);
+        Relation.listUncles(current);
+        Relation.listCousins(current);
+        Relation.listGrandMothers(current);
+        Relation.listGrandFathers(current);
+    }
 
     // Return uncles of the current
     public static LinkedList<Member> getUncles(Member current) {

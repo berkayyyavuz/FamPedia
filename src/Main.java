@@ -3,58 +3,44 @@ public class Main {
     public static void main(String[] args) {
 
 
-        // Create a family tree
-        Member mom = new Member("Aygül", 'F');
-        Member dad = new Member("Veysel", 'M');
-        Member sister = new Member("İgor", 'F');
-        Member brother = new Member("Kadir2", 'M');
-        Member me = new Member("Ben (Kadir)", 'M');
+// Create a family tree
 
-        Member kadirincocu = new Member("Kadirin Çocuğu", 'M');
+        Member dede = new Member("Mehmet", 'M');
+        Member dede2 = new Member("Mehmet2", 'M');
+        Member nene = new Member("Yüksel", 'F');
+        Member nene2 = new Member("Yüksel2", 'F');
 
-        Member hikmet = new Member("Hikmet", 'M');
-        Member emanet = new Member("Emanet", 'F');
+        Member mom = new Member("Nurgül", 'F');
+        Member dad = new Member("Kadir", 'M');
+        Member brother = new Member("Cihan", 'M');
+        Member me = new Member("SİNAN", 'M');
 
-        Member selamet = new Member("Selamet", 'F');
-        Member meyme = new Member("Meyme", 'F');
-        Member ammet = new Member("Ammet", 'M');
 
-        Member mahmut = new Member("Mahmut", 'M');
+        Member akif = new Member("akif", 'M');
+        Member hulya = new Member("hulya", 'F');
 
-        Member ibrahim = new Member("İbrahim", 'M');
-        Member vildan = new Member("Vildan", 'F');
+        Member kuzi = new Member("Kaan", 'M');
 
-        Member uncle = new Member("Cemal", 'M');
-        Member aunt = new Member("Çınare", 'F');
-        Member cousin = new Member("Ahmet", 'M');
+        Relation.addParent(dad, dede);
+        Relation.addParent(dad, nene);
+        Relation.addParent(mom, dede2);
+        Relation.addParent(mom, nene2);
 
-        // Add members to the family tree
         Relation.addParent(me, mom);
         Relation.addParent(me, dad);
-        Relation.addSibling(me, sister);
         Relation.addSibling(me, brother);
 
-        Relation.addParent(dad, meyme);
-        Relation.addParent(mom, ammet);
+        Relation.addSibling(dad, akif);
 
-        // Kadirin cocu
-        Relation.addParent(kadirincocu, brother);
 
-        Relation.addSibling(mom, selamet);
-        Relation.addSibling(mom, hikmet);
+        Relation.setSpouse(akif, hulya);
+        Relation.addParent(kuzi, akif);
 
-        Relation.addChild(selamet, ibrahim);
-        Relation.addParent(vildan, hikmet);
 
-        Relation.setSpouse(mom, dad);
-        Relation.setSpouse(selamet, mahmut);
-        Relation.setSpouse(hikmet, emanet);
+        Relation.listAllRelations(dad);
 
-        Relation.addSibling(dad, uncle);
 
-        Relation.addParent(cousin, uncle);
-        Relation.addParent(cousin, aunt);
-        Relation.setSpouse(aunt, uncle);
+        dad.printRelations();
 
         /*
         Relation.listUncles(cousin);
@@ -81,17 +67,7 @@ public class Main {
         hikmet.printRelations();
         */
 
-        Relation.listUncles(kadirincocu);
-        Relation.listAunts(kadirincocu);
-        Relation.listCousins(kadirincocu);
-        Relation.listGrandMothers(me);
-        Relation.listGrandMothers(kadirincocu);
-        Relation.listGrandFathers(kadirincocu);
-        Relation.listGrandFathers(me);
 
-        kadirincocu.printRelations();
-        brother.printRelations();
-        me.printRelations();
 
     }
 
