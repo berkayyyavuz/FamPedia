@@ -1,11 +1,15 @@
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EtchedBorder;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.util.HashMap;
-import java.util.ListIterator;
+import java.io.IOException;
+import java.util.Vector;
 
 public class CreateTree extends JPanel {
     JPanel newMemberPanel, treePanel;
@@ -14,10 +18,12 @@ public class CreateTree extends JPanel {
     JRadioButton btn1, btn2, btn3, btn4, btn5, btn6;
     Tree tree;
     Member ancient;
+
     public void setMainPanel() {
         splitPane = new JSplitPane();
-        treePanel = new JPanel();
+        ancient = new Member();
         tree = new Tree(ancient);
+        treePanel = new JPanel();
         treePanel.setPreferredSize(new Dimension(500,500));
         setNewMemberPanel();
         splitPane.setLeftComponent(newMemberPanel);
@@ -38,7 +44,6 @@ public class CreateTree extends JPanel {
         JLabel lbl6 = new JLabel("Live Status:");
         JLabel lbl7 = new JLabel("Father Name:");
         JLabel lbl8 = new JLabel("Mother Name:");
-//boş bırakmaması için zorlayayım mı?
         //text fields
         txt1 = new JTextField(15);
         lbl1.setLabelFor(txt1);
@@ -104,10 +109,10 @@ public class CreateTree extends JPanel {
         saveButton.addActionListener(e ->{
             createMember();
             setComponentsNull();
-            //treePanel.add(new TreePanel(tree)); /** does not work */
+            treePanel = new JPanel();
+            treePanel.add(new PrintTree(tree));
             treePanel.revalidate();
         });
-        treePanel.add(new TreePanel(tree));
     }
 
     // get inputs to create a new member
@@ -130,19 +135,24 @@ public class CreateTree extends JPanel {
                 member.setIsAlive(LiveState.died);
                 member.setDeathYear(Integer.parseInt(txt3.getText())); // set death year
             }
+
             tree.searchParent(txt4.getText(), txt5.getText(), member); // set mother and father
             if(member.getFather() != null)  // set generation
                 member.setGeneration(member.getFather().getGeneration()+1);
-            else member.setGeneration(1);
+            else {
+                member.setGeneration(1);
+                tree.setRoot(member);
+            }
+            ancient.getMembers().add(member);
             tree.insert(member); // insert into tree
             System.out.println(member.toString());
+
         }catch (NumberFormatException e){ // check if properties are valid
             JDialog warning = new JDialog();
             JOptionPane.showMessageDialog(warning, "Please enter a valid input!");
             System.err.println("Year(s) have been written in a wrong format!");
             setComponentsNull();
         }
-
     }
 
     // set components to null for adding new members
@@ -154,110 +164,131 @@ public class CreateTree extends JPanel {
         txt4.setText("");
         txt5.setText("");
     }
+
+
 }
-class TreePanel extends JPanel{
-    Tree tree;
-    private HashMap<String, Coordinates> coord;
+class PrintTree extends JPanel implements TreeSelectionListener {
 
-    public TreePanel(Tree tree) {
-        this.tree = tree;
-        coord = new HashMap<>();
-        Coordinates coordinates = new Coordinates(0,0,0,0);
-        coordinates.setAllCoords();
+    private JTree tree;
+    private JEditorPane htmlPane;
+    private static boolean playWithLineStyle = false;
+    private static String lineStyle = "Horizontal";
+    private static boolean useSystemLookAndFeel = false;
+    private static boolean DEBUG = false;
 
-        revalidate();
+    Tree familyTree;
+
+    public PrintTree(Tree familyTree) {
+        super(new GridLayout(1,0));
+
+        this.familyTree = familyTree;
+
+        //Create the nodes.
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode(familyTree.getRoot().getName());
+        createNodes(top);
+
+        //Create a tree that allows one selection at a time.
+        tree = new JTree(top);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+        //Listen for when the selection changes.
+        tree.addTreeSelectionListener(this);
+
+        if (playWithLineStyle) {
+            System.out.println("line style = " + lineStyle);
+            tree.putClientProperty("JTree.lineStyle", lineStyle);
+        }
+        JScrollPane treeView = new JScrollPane(tree);
+
+        //Create the HTML viewing pane.
+        htmlPane = new JEditorPane();
+        htmlPane.setEditable(false);
+        JScrollPane htmlView = new JScrollPane(htmlPane);
+
+        //Add the scroll panes to a split pane.
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setTopComponent(treeView);
+        splitPane.setBottomComponent(htmlView);
+
+        Dimension minimumSize = new Dimension(100, 50);
+        htmlView.setMinimumSize(minimumSize);
+        treeView.setMinimumSize(minimumSize);
+        splitPane.setDividerLocation(100);
+        splitPane.setPreferredSize(new Dimension(500, 300));
+
+        //Add the split pane to this panel.
+        add(splitPane);
     }
-/** does not work */
+    private void display(String info) {
+        try {
+            if (info != null) {
+                htmlPane.setPage(info);
+            } else { //null url
+                htmlPane.setText("File Not Found");
+                if (DEBUG) {
+                    System.out.println("Attempted to display a null content");
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Attempted to read a bad content: " + info);
+        }
+    }
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(Color.black);
-        for (int i = 1; i < 20; i++) {
-            for (int j = 0; j < tree.getGenerationSize(i); j++) {
-                Coordinates personCoords = coord.get(tree.getSortedlist().get(j).getName());
-                System.out.println(tree.getSortedlist().get(j).getName());
-                System.out.println(personCoords.x);
-                System.out.println(personCoords.y);
+    public void valueChanged(TreeSelectionEvent e) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
-                g.setFont(new Font("SERIF", 1, 12));
-                g.setColor(Color.white);
-                g.fillOval(personCoords.x, personCoords.y, personCoords.width, personCoords.height);
-                g.setColor(Color.black);
-                g.drawString(tree.getSortedlist().get(j).getName(), personCoords.x + 5, personCoords.y + 15);
-                g.setColor(Color.black);
-                g.drawOval(personCoords.x, personCoords.y, personCoords.width, personCoords.height);
-                g.setColor(Color.black);
-                if (tree.getSortedlist().get(j).getSpouse() != null) {
-                    for (int l = 0; l < tree.getGenerationSize(i); l++) {
-                        if (tree.getSortedlist().get(j).getSpouse().equals(tree.getSortedlist().get(l))) {
-                            if (j < l) {
-                                g.drawLine(personCoords.x + personCoords.width, personCoords.y + 10, coord.get(tree.getSortedlist().get(l).getName()).x, coord.get(tree.getSortedlist().get(l).getName()).y + 10);
-                            } else {
+        if (node == null) return;
 
-                            }
-                        }
-
-                    }
-
-                }
-                if (tree.getSortedlist().get(j).getChildren().size() != 0 && i < 19) {
-                    ListIterator<String> iter = tree.getSortedlist().get(j).getChildren().listIterator();
-                    while (iter.hasNext()) {
-                        String child = iter.next();
-                        for (int k = 0; k < tree.getGenerationSize(i + 1); k++) {
-                            if (child.equals(tree.getSortedlist().get(k).getName())) {
-
-                                g.drawLine(personCoords.x + personCoords.width / 2, personCoords.y + 20, coord.get(tree.getSortedlist().get(k).getName()).x + coord.get(tree.getSortedlist().get(k).getName()).width / 2, coord.get(tree.getSortedlist().get(k).getName()).y);
-
-                            }
-                        }
-
-                    }
-                }
-            }
+        Object nodeInfo = node.getUserObject();
+        if (node.isLeaf()) {
+            Person person = (Person) nodeInfo;
+            display(person.info);
         }
-        revalidate();
-        repaint();
+        if (DEBUG) {
+            System.out.println(nodeInfo.toString());
+        }
     }
-    public class Coordinates {
 
-        private int x;
-        private int y;
-        private int width;
-        private int height;
+    private class Person {
+        public String personName;
+        public String info;
 
-        public Coordinates(int x, int y, int width, int height) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
+        public Person(Member member) {
+            personName = member.getName();
+            info = member.toString();
         }
 
-        public void setAllCoords(){
-            for(int i=0;i<tree.getSortedlist().size();i++){
-                changePersonCoords(i);
-            }
-        }
-        public void changePersonCoords(int i) {
-
-            calcCoordinates(tree.getSortedlist().get(i).getGeneration(), i, new Dimension(100,50));
-            coord.put(tree.getSortedlist().get(i).getName(), new Coordinates(x, y, width,height));
-        }
-        public void calcCoordinates(int level, int i, Dimension dim) {
-            AffineTransform affinetransform = new AffineTransform();
-            FontRenderContext frc = new FontRenderContext(affinetransform, false, false);
-            Font f = new Font("SERIF", 1, 12);
-            this.width = (int) (f.getStringBounds(tree.getSortedlist().get(i).getName(), frc).getWidth()) + 10;
-            this.height = 20;
-            this.x = 300+dim.width / (tree.getGenerationSize(level) + 1) * (i + 1) - this.width / 2;
-            this.y = 20 + level * 50 + 34;
-        }
-
-
+        @Override
         public String toString() {
-            String str = x + "." + y + "." + width + "." + height + ".";
-            return str;
+            return personName;
         }
+    }
+    private void createNodes(DefaultMutableTreeNode top) {
+        DefaultMutableTreeNode category = null;
+        DefaultMutableTreeNode person = null;
 
+        Member member = familyTree.getRoot(); // initially
+        for (int j=0;j<Member.generationCount;j++) {
+            if (member.getSpouse() != null) {
+                // print spouse
+                category = new DefaultMutableTreeNode("Spouse");
+                top.add(category);
+                person = new DefaultMutableTreeNode(new Person(member.getSpouse()));
+                category.add(person);
+            }
+            // print children
+            if (member.getChildren().size() != 0) {
+                category = new DefaultMutableTreeNode("Children");
+                top.add(category);
+                for (int i = 0; i < member.getChildren().size(); i++) {
+                    person = new DefaultMutableTreeNode(new Person(member.getChildren().get(i)));
+                    category.add(person);
+                    member = member.getChildren().get(i);
+
+                }
+            }
+            top=person;
+        }
     }
 }
+

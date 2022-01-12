@@ -19,7 +19,7 @@ public class Member{
     private Member hala;
     private Member spouse;
     private Member child;
-    private LinkedList<String> children; //new
+    private LinkedList<Member> children; //new
 
     public Member(String name, int birthYear, int deathYear,
                   GenderType gender, MarriageState isMarried, LiveState isAlive,
@@ -58,11 +58,11 @@ public class Member{
          children = new LinkedList<>();
     }
 
-    public LinkedList<String> getChildren() {
+    public LinkedList<Member> getChildren() {
         return children;
     }
 
-    public void setChildren(LinkedList<String> children) {
+    public void setChildren(LinkedList<Member> children) {
         this.children = children;
     }
 

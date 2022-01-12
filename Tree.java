@@ -62,12 +62,14 @@ public class Tree {
      }
 
      public void setChild(Member member){
-
+// ask for spouse name from the user
         if(member.getMother() != null && member.getFather() != null){
             member.getMother().setChild(member);
-            member.getMother().getChildren().add(member.getName());
+            member.getMother().setSpouse(member.getFather());
+            member.getMother().getChildren().add(member);
             member.getFather().setChild(member);
-            member.getFather().getChildren().add(member.getName());
+            member.getFather().setSpouse(member.getMother());
+            member.getFather().getChildren().add(member);
         }
      }
 
@@ -109,11 +111,11 @@ public class Tree {
         for(int i=0;i< sortedlist.size();i++) {
             switch (getSortedlist().get(i).getGender()) {
                 case male:
-                    if (getSortedlist().get(i).getName().equals(fatherName) && getSortedlist().get(i).getGeneration() < member.getGeneration())
+                    if (getSortedlist().get(i).getName().equals(fatherName))
                         member.setFather(getSortedlist().get(i));
                     break;
                 case female:
-                    if (getSortedlist().get(i).getName().equals(motherName) && getSortedlist().get(i).getGeneration() < member.getGeneration())
+                    if (getSortedlist().get(i).getName().equals(motherName))
                         member.setMother(getSortedlist().get(i));
                     break;
                 case unknown:
