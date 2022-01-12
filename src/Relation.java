@@ -163,6 +163,49 @@ public class Relation {
         return found;
     }
 
+    // Get the grandMother of the current
+    public static boolean listGrandMothers(Member current) {
+        boolean found = false;
+
+        for (Member parent : current.relation.parents) {
+            for (Member grandParent : parent.relation.parents) {
+                if (grandParent.gender == 'F') {
+                    current.relation.grandMothers.add(grandParent);
+                    found = true;
+                }
+            }
+        }
+
+        // Update current's sibling's uncle
+        for (Member sibling : current.relation.siblings) {
+            sibling.relation.grandMothers = current.relation.grandMothers;
+        }
+
+        return found;
+    }
+
+    // Get the grandMother of the current
+    public static boolean listGrandFathers(Member current) {
+        boolean found = false;
+
+        for (Member parent : current.relation.parents) {
+            for (Member grandParent : parent.relation.parents) {
+                if (grandParent.gender == 'M') {
+                    current.relation.grandFathers.add(grandParent);
+                    found = true;
+                }
+            }
+        }
+
+        // Update current's sibling's uncle
+        for (Member sibling : current.relation.siblings) {
+            sibling.relation.grandFathers = current.relation.grandFathers;
+        }
+
+        return found;
+    }
+
+
     // Return uncles of the current
     public static LinkedList<Member> getUncles(Member current) {
         return current.relation.uncles;
@@ -176,6 +219,16 @@ public class Relation {
     // Return cousins of the current
     public static LinkedList<Member> getCousins(Member current) {
         return current.relation.cousins;
+    }
+
+    // Return grandMothers of the current
+    public static LinkedList<Member> getGrandMothers(Member current) {
+        return current.relation.grandMothers;
+    }
+
+    // Return grandFathers of the current
+    public static LinkedList<Member> getGrandFathers(Member current) {
+        return current.relation.grandFathers;
     }
 
     public Member getSpouse() {

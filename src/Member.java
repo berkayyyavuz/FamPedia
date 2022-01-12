@@ -61,6 +61,18 @@ public class Member {
         for (Member cousin : Relation.getCousins(this)) {
             System.out.println("\t\t" + cousin.name);
         }
+
+        // loop the grandMothers
+        System.out.println("\tGrandMothers: ");
+        for (Member grandMother : Relation.getGrandMothers(this)) {
+            System.out.println("\t\t" + grandMother.name);
+        }
+        
+        // loop the grandFathers
+        System.out.println("\tGrandFathers: ");
+        for (Member grandFather : Relation.getGrandFathers(this)) {
+            System.out.println("\t\t" + grandFather.name);
+        }
     }
     
 }

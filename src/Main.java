@@ -7,8 +7,8 @@ public class Main {
         Member mom = new Member("Aygül", 'F');
         Member dad = new Member("Veysel", 'M');
         Member sister = new Member("İgor", 'F');
-        Member brother = new Member("Kadir", 'M');
-        Member me = new Member("Kadirin EX", 'M');
+        Member brother = new Member("Kadir2", 'M');
+        Member me = new Member("Ben (Kadir)", 'M');
 
         Member kadirincocu = new Member("Kadirin Çocuğu", 'M');
 
@@ -16,6 +16,8 @@ public class Main {
         Member emanet = new Member("Emanet", 'F');
 
         Member selamet = new Member("Selamet", 'F');
+        Member meyme = new Member("Meyme", 'F');
+        Member ammet = new Member("Ammet", 'M');
 
         Member mahmut = new Member("Mahmut", 'M');
 
@@ -31,6 +33,9 @@ public class Main {
         Relation.addParent(me, dad);
         Relation.addSibling(me, sister);
         Relation.addSibling(me, brother);
+
+        Relation.addParent(dad, meyme);
+        Relation.addParent(mom, ammet);
 
         // Kadirin cocu
         Relation.addParent(kadirincocu, brother);
@@ -79,10 +84,14 @@ public class Main {
         Relation.listUncles(kadirincocu);
         Relation.listAunts(kadirincocu);
         Relation.listCousins(kadirincocu);
+        Relation.listGrandMothers(me);
+        Relation.listGrandMothers(kadirincocu);
+        Relation.listGrandFathers(kadirincocu);
+        Relation.listGrandFathers(me);
 
         kadirincocu.printRelations();
         brother.printRelations();
-        
+        me.printRelations();
 
     }
 
