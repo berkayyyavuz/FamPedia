@@ -8,7 +8,7 @@ public class Main {
         Member dad = new Member("Veysel", 'M');
         Member sister = new Member("İgor", 'F');
         Member brother = new Member("Kadir", 'M');
-        Member me = new Member("Ben (Çağrı)", 'M');
+        Member me = new Member("Kadirin EX", 'M');
 
         Member kadirincocu = new Member("Kadirin Çocuğu", 'M');
 
