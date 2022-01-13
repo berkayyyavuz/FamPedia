@@ -5,42 +5,38 @@ public class Main {
 
 // Create a family tree
 
-        Member dede = new Member("Mehmet", 'M');
-        Member dede2 = new Member("Mehmet2", 'M');
-        Member nene = new Member("Yüksel", 'F');
-        Member nene2 = new Member("Yüksel2", 'F');
+        Member dede = new Member("Avni", 'M');
+        Member nene = new Member("Melek", 'F');
 
-        Member mom = new Member("Nurgül", 'F');
-        Member dad = new Member("Kadir", 'M');
-        Member brother = new Member("Cihan", 'M');
-        Member me = new Member("SİNAN", 'M');
+        Member mom = new Member("Dilek", 'F');
+        Member dad = new Member("Turgay", 'M');
+
+        Member me = new Member("ECE", 'F');
 
 
-        Member akif = new Member("akif", 'M');
-        Member hulya = new Member("hulya", 'F');
+        Member mom2 = new Member("Ayfer", 'F');
+        Member dad2 = new Member("Cengiz", 'M');
 
-        Member kuzi = new Member("Kaan", 'M');
+        Member kuzi = new Member("Oğuz", 'M');
+
+        Relation.setSpouse(dede, nene);
 
         Relation.addParent(dad, dede);
-        Relation.addParent(dad, nene);
-        Relation.addParent(mom, dede2);
-        Relation.addParent(mom, nene2);
+        Relation.addParent(dad2, dede);
 
-        Relation.addParent(me, mom);
+        Relation.setSpouse(dad, mom);
+        Relation.setSpouse(dad2, mom2);
+
         Relation.addParent(me, dad);
-        Relation.addSibling(me, brother);
-
-        Relation.addSibling(dad, akif);
+        Relation.addParent(kuzi, dad2);
 
 
-        Relation.setSpouse(akif, hulya);
-        Relation.addParent(kuzi, akif);
+        Relation.listAllRelations(me);
+        me.printRelations();
 
 
-        Relation.listAllRelations(dad);
 
 
-        dad.printRelations();
 
         /*
         Relation.listUncles(cousin);

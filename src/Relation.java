@@ -54,7 +54,18 @@ public class Relation {
         if (!parent.relation.children.contains(current)) {
             Relation.addChild(parent, current);
         }
+
+        if (parent.relation.spouse != null) {
+            current.relation.parents.add(parent.relation.spouse);
+        }
+
+        for (Member child : parent.relation.children) {
+            if (child != current) {
+                addSibling(current, child);
+            }
+        }
     }
+
 
     public static void addSibling(Member current, Member sibling) {
         current.relation.siblings.add(sibling);
