@@ -1,61 +1,46 @@
 import javax.swing.*;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class CreateTree extends JPanel {
     JPanel newMemberPanel, treePanel;
     JSplitPane splitPane;
-    JTextField txt1, txt2, txt3, txt4, txt5;
-    JRadioButton btn1, btn2, btn3, btn4, btn5, btn6;
-    Tree tree;
-    Member ancient;
+    JTextField txt1, txt2;
+    JRadioButton btn1, btn2;
+    JComboBox boxMembers, boxRelations;
+    ArrayList<Member> members;
 
     public void setMainPanel() {
         splitPane = new JSplitPane();
-        ancient = new Member();
-        tree = new Tree(ancient);
         treePanel = new JPanel();
         treePanel.setPreferredSize(new Dimension(500,500));
         setNewMemberPanel();
         splitPane.setLeftComponent(newMemberPanel);
         splitPane.setRightComponent(treePanel);
         add(splitPane);
-
+        members = new ArrayList<>();
     }
 
     public void setNewMemberPanel() {
-        newMemberPanel = new JPanel(new GridLayout(20, 0));
+        newMemberPanel = new JPanel(new GridLayout(14, 0));
 
         //labels
         JLabel lbl1 = new JLabel("Name:");
-        JLabel lbl2 = new JLabel("BirthYear:");
-        JLabel lbl3 = new JLabel("DeathYear:");
-        JLabel lbl4 = new JLabel("Gender:");
-        JLabel lbl5 = new JLabel("Marriage Status:");
-        JLabel lbl6 = new JLabel("Live Status:");
-        JLabel lbl7 = new JLabel("Father Name:");
-        JLabel lbl8 = new JLabel("Mother Name:");
+        JLabel lbl2 = new JLabel("Gender:");
+        JLabel lbl3 = new JLabel("Married With (Optional):");
+        JLabel lbl4 = new JLabel("Select Member:");
+        JLabel lbl5 = new JLabel("Select Relation:");
+
         //text fields
         txt1 = new JTextField(15);
         lbl1.setLabelFor(txt1);
         txt2 = new JTextField(15);
         lbl2.setLabelFor(txt2);
-        txt3 = new JTextField(15);
-        txt3.setEditable(false); // first, we must know if the member is dead
-        lbl3.setLabelFor(txt3);
-        txt4 = new JTextField(15);
-        lbl7.setLabelFor(txt4);
-        txt5 = new JTextField(15);
-        lbl8.setLabelFor(txt5);
 
         //radio buttons
         btn1 = new JRadioButton("Male");
@@ -64,107 +49,163 @@ public class CreateTree extends JPanel {
         buttonGroup1.add(btn1);
         buttonGroup1.add(btn2);
 
-        btn3 = new JRadioButton("Alive");
-        btn4 = new JRadioButton("Dead");
-        ButtonGroup buttonGroup2 = new ButtonGroup();
-        buttonGroup2.add(btn3);
-        buttonGroup2.add(btn4);
-
-        btn5 = new JRadioButton("Married");
-        btn6 = new JRadioButton("Unmarried");
-        ButtonGroup buttonGroup3 = new ButtonGroup();
-        buttonGroup3.add(btn5);
-        buttonGroup3.add(btn6);
-
+        // comboBoxes
+        boxMembers = new JComboBox();
+        lbl4.setLabelFor(boxMembers);
+        String[] relationStrings = { "None", "Mother", "Father", "Child", "Sibling" };
+        boxRelations = new JComboBox(relationStrings);
+        lbl5.setLabelFor(boxRelations);
 
         // save button
-        JButton saveButton = new JButton("Save");
+        JButton saveButton = new JButton("Add Member");
+        JButton btnTree = new JButton("Create Your Family Tree");
+
+        JPanel space = new JPanel(); // to create a space
 
         // add components into the panel
-        newMemberPanel.add(lbl4);
+        newMemberPanel.add(lbl2);
         newMemberPanel.add(btn1);
         newMemberPanel.add(btn2); // gender components
         newMemberPanel.add(lbl1);
         newMemberPanel.add(txt1); // name components
-        newMemberPanel.add(lbl2);
-        newMemberPanel.add(txt2); // birth year components
-        newMemberPanel.add(lbl5);
-        newMemberPanel.add(btn5);
-        newMemberPanel.add(btn6); // marriage status components
-        newMemberPanel.add(lbl6);
-        newMemberPanel.add(btn3);
-        newMemberPanel.add(btn4); // live status components
         newMemberPanel.add(lbl3);
-        newMemberPanel.add(txt3); // death year components
-        newMemberPanel.add(lbl7);
-        newMemberPanel.add(txt4); // father components
-        newMemberPanel.add(lbl8);
-        newMemberPanel.add(txt5); // mother components
+        newMemberPanel.add(txt2); // marriage components
+        newMemberPanel.add(lbl4);
+        newMemberPanel.add(boxMembers);
+        newMemberPanel.add(lbl5);
+        newMemberPanel.add(boxRelations);
+        newMemberPanel.add(space);
         newMemberPanel.add(saveButton);
-
-        btn4.addActionListener(e -> txt3.setEditable(true));
-        btn3.addActionListener(e -> txt3.setEditable(false));
+        newMemberPanel.add(space);
+        newMemberPanel.add(btnTree);
         newMemberPanel.revalidate();
 
+        // save button to add new members to the tree
         saveButton.addActionListener(e ->{
             createMember();
             setComponentsNull();
-            treePanel = new JPanel();
-            treePanel.add(new PrintTree(tree));
+            newMemberPanel.revalidate();
+            splitPane.revalidate();
             treePanel.revalidate();
+        });
+/*jLabel4 = new JLabel("<html><body>Select a label below, then click on \"Add\" button.<br>" +
+                "Then, click on \"Save\" button to finish.</body></html>");*/
+        btnTree.addActionListener(e -> {
+            JPanel boxPanel = new JPanel();
+            JPanel lblPanel = new JPanel();
+            newMemberPanel = new JPanel(new GridLayout(2,0));
+            JLabel lblExp = new JLabel("<html><body>Select a family <br>member to see <br>relations:</body></html>");
+            lblExp.setFont(new Font("Arial", Font.ITALIC, 14));
+            lblPanel.add(lblExp);
+            boxPanel.add(boxMembers);
+            newMemberPanel.add(lblPanel);
+            newMemberPanel.add(boxPanel);
+
+            // add a check box to center a member in the tree
+            boxMembers.addActionListener(e1 -> {
+                Member relative = new Member("", 'U');
+                for(int i=0;i< members.size();i++){
+                    if(boxMembers.getSelectedIndex() == i)
+                        relative = members.get(i);
+                }
+                treePanel = new JPanel();
+                // call PrintTree to show the tree at the point of view of selected member
+                treePanel.add(new PrintTree(relative));
+                relative.printRelations();
+                splitPane.setRightComponent(treePanel);
+                splitPane.revalidate();
+                treePanel.revalidate();
+            });
+
+            splitPane.setLeftComponent(newMemberPanel);
+            splitPane.revalidate();
+            newMemberPanel.revalidate();
         });
     }
 
     // get inputs to create a new member
-    public void createMember(){
-        Member member = new Member();
+    public void createMember() {
+        JLabel report = new JLabel(); // print the member info on screen
+        report.setFont(new Font("Arial", Font.ITALIC, 16));
+        JPanel lblPanel = new JPanel();
+        lblPanel.setPreferredSize(new Dimension(500, 25));
         try {
-            if (btn1.isSelected()) // set gender type male
-                member.setGender(GenderType.male);
-            if (btn2.isSelected()) // set gender type female
-                member.setGender(GenderType.female);
-            member.setName(txt1.getText());  // set name
-            member.setBirthYear(Integer.parseInt(txt2.getText()));  // set birth year
-            if (btn5.isSelected())  // set marriage status as married
-                member.setIsMarried(MarriageState.married);
-            if (btn6.isSelected())  // set marriage status as unmarried
-                member.setIsMarried(MarriageState.unmarried);
-            if (btn3.isSelected())  // set if person is alive
-                member.setIsAlive(LiveState.alive);
-            if (btn4.isSelected()) {  // set if person is died
-                member.setIsAlive(LiveState.died);
-                member.setDeathYear(Integer.parseInt(txt3.getText())); // set death year
-            }
 
-            tree.searchParent(txt4.getText(), txt5.getText(), member); // set mother and father
-            if(member.getFather() != null)  // set generation
-                member.setGeneration(member.getFather().getGeneration()+1);
-            else {
-                member.setGeneration(1);
-                tree.setRoot(member);
-            }
-            ancient.getMembers().add(member);
-            tree.insert(member); // insert into tree
-            System.out.println(member.toString());
+            // checks if one of the fields is null
+            if (txt1.getText().isEmpty()) throw new InvalidPropertyException("Name field cannot be null!");
+            if (!(btn1.isSelected() || btn2.isSelected())) throw new InvalidPropertyException("None of the gender buttons are selected!");
 
-        }catch (NumberFormatException e){ // check if properties are valid
-            JDialog warning = new JDialog();
-            JOptionPane.showMessageDialog(warning, "Please enter a valid input!");
-            System.err.println("Year(s) have been written in a wrong format!");
-            setComponentsNull();
+            Member member = new Member("", 'U');
+        if (btn1.isSelected()) member = new Member(txt1.getText(), 'M');
+        if (btn2.isSelected()) member = new Member(txt1.getText(), 'F');
+        members.add(member);
+
+        report.setText(member.name + " is added.");
+        lblPanel.add(report);
+        treePanel.add(lblPanel);
+
+        boxMembers.addItem(member.name);  // add member names into the combo box
+        System.out.println(member.name + " is added.");
+
+        // set spouse
+        Member spouse = new Member("", 'U');
+        if (!txt2.getText().isEmpty()) {  // set spouse if exists
+            if (btn1.isSelected())
+                spouse = new Member(txt2.getText(), 'F');
+            if (btn2.isSelected())
+                spouse = new Member(txt2.getText(), 'M');
+            Relation.setSpouse(member, spouse);
+            members.add(spouse);
+            boxMembers.addItem(spouse.name);  // add member names into the combo box
+            System.out.println(spouse.name + " is added.");
+            report.setText(spouse.name + " is set as spouse of " + member.name);
+            lblPanel.add(report);
+            treePanel.add(lblPanel);
         }
+
+        // get the selected member from combo box
+        Member relative = new Member("", 'U');
+        for (int i = 0; i < members.size(); i++) {
+            if (boxMembers.getSelectedIndex() == i)
+                relative = members.get(i);
+        }
+
+        // set relations
+        int index = boxRelations.getSelectedIndex();
+        System.out.println(index);
+        switch (index) {
+            case 1:  // mother
+            case 2:  // father
+                Relation.addParent(member, relative);
+                report.setText(relative.name + " is set as a parent of " + member.name);
+                lblPanel.add(report);
+                treePanel.add(lblPanel);
+                break;
+            case 3:  // child
+                Relation.addChild(member, relative);
+                report.setText(relative.name + " is set as a child of " + member.name);
+                lblPanel.add(report);
+                treePanel.add(lblPanel);
+                break;
+            case 4:  // sibling
+                Relation.addSibling(member, relative);
+                report.setText(relative.name + " is set as a sibling of " + member.name);
+                lblPanel.add(report);
+                treePanel.add(lblPanel);
+                break;
+        }
+    } catch (InvalidPropertyException exception) {
+        System.out.println(exception.getMessage());
+        JDialog help = new JDialog();
+        JOptionPane.showMessageDialog(help, exception.getMessage());
+    }
     }
 
     // set components to null for adding new members
     public void setComponentsNull() {
-
         txt1.setText("");
         txt2.setText("");
-        txt3.setText("");
-        txt4.setText("");
-        txt5.setText("");
     }
-
 
 }
 class PrintTree extends JPanel implements TreeSelectionListener {
@@ -175,16 +216,15 @@ class PrintTree extends JPanel implements TreeSelectionListener {
     private static String lineStyle = "Horizontal";
     private static boolean useSystemLookAndFeel = false;
     private static boolean DEBUG = false;
+    Member root;
 
-    Tree familyTree;
+    public PrintTree(Member root) {
+        super(new GridLayout(1, 0));
 
-    public PrintTree(Tree familyTree) {
-        super(new GridLayout(1,0));
-
-        this.familyTree = familyTree;
+        this.root = root;
 
         //Create the nodes.
-        DefaultMutableTreeNode top = new DefaultMutableTreeNode(familyTree.getRoot().getName());
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode(root.name);
         createNodes(top);
 
         //Create a tree that allows one selection at a time.
@@ -219,11 +259,12 @@ class PrintTree extends JPanel implements TreeSelectionListener {
         //Add the split pane to this panel.
         add(splitPane);
     }
+
     private void display(String info) {
         try {
             if (info != null) {
                 htmlPane.setPage(info);
-            } else { //null url
+            } else {
                 htmlPane.setText("File Not Found");
                 if (DEBUG) {
                     System.out.println("Attempted to display a null content");
@@ -233,6 +274,7 @@ class PrintTree extends JPanel implements TreeSelectionListener {
             System.err.println("Attempted to read a bad content: " + info);
         }
     }
+
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -242,7 +284,7 @@ class PrintTree extends JPanel implements TreeSelectionListener {
         Object nodeInfo = node.getUserObject();
         if (node.isLeaf()) {
             Person person = (Person) nodeInfo;
-            display(person.info);
+            display(person.personName);
         }
         if (DEBUG) {
             System.out.println(nodeInfo.toString());
@@ -251,11 +293,9 @@ class PrintTree extends JPanel implements TreeSelectionListener {
 
     private class Person {
         public String personName;
-        public String info;
 
         public Person(Member member) {
-            personName = member.getName();
-            info = member.toString();
+            personName = member.name;
         }
 
         @Override
@@ -263,32 +303,186 @@ class PrintTree extends JPanel implements TreeSelectionListener {
             return personName;
         }
     }
-    private void createNodes(DefaultMutableTreeNode top) {
+
+    public void createNodes(DefaultMutableTreeNode top) {
         DefaultMutableTreeNode category = null;
+        DefaultMutableTreeNode category1 = null;
         DefaultMutableTreeNode person = null;
+        DefaultMutableTreeNode person1 = null;
+        DefaultMutableTreeNode person2 = null;
 
-        Member member = familyTree.getRoot(); // initially
-        for (int j=0;j<Member.generationCount;j++) {
-            if (member.getSpouse() != null) {
-                // print spouse
-                category = new DefaultMutableTreeNode("Spouse");
-                top.add(category);
-                person = new DefaultMutableTreeNode(new Person(member.getSpouse()));
+        Member member = root; // initially
+
+        // print grandfathers
+        if (member.relation.getGrandFathers(root).size() != 0) {
+            category = new DefaultMutableTreeNode("GrandFathers");
+            top.add(category);
+            for (int i = 0; i < member.relation.getGrandFathers(root).size(); i++) {
+                person = new DefaultMutableTreeNode(new Person(member.relation.getGrandFathers(root).get(i)));
                 category.add(person);
-            }
-            // print children
-            if (member.getChildren().size() != 0) {
-                category = new DefaultMutableTreeNode("Children");
-                top.add(category);
-                for (int i = 0; i < member.getChildren().size(); i++) {
-                    person = new DefaultMutableTreeNode(new Person(member.getChildren().get(i)));
-                    category.add(person);
-                    member = member.getChildren().get(i);
-
+                // print grandfather's spouse
+                if (member.relation.getGrandFathers(root).get(i).relation.getSpouse() != null) {
+                    person1 = new DefaultMutableTreeNode(new Person(member.relation.getGrandFathers(root).get(i).relation.getSpouse()));
+                    person.add(person1);
+                }
+                // print children
+                if (member.relation.getGrandFathers(root).get(i).relation.getChildren().size() != 0) {
+                    category = new DefaultMutableTreeNode("Children");
+                    person1.add(category);
+                    for (int t = 0; t < member.relation.getGrandFathers(root).get(i).relation.getChildren().size(); t++) {
+                        person2 = new DefaultMutableTreeNode(new Person(member.relation.getGrandFathers(root).get(i).relation.getChildren().get(t)));
+                        category.add(person2);
+                    }
                 }
             }
-            top=person;
+        }
+        //print parents
+        if (member.relation.getParents().size() != 0) {
+            category = new DefaultMutableTreeNode("Parents");
+            top.add(category);
+            for (int i = 0; i < member.relation.getParents().size(); i++) {
+                person = new DefaultMutableTreeNode(new Person(member.relation.getParents().get(i)));
+                category.add(person);
+            }
+        }
+        // print spouse
+        if (member.relation.getSpouse() != null) {
+            category = new DefaultMutableTreeNode("Spouse");
+            top.add(category);
+            person = new DefaultMutableTreeNode(new Person(member.relation.getSpouse()));
+            category.add(person);
+        }
+        // print siblings
+        if (member.relation.getSiblings().size() != 0) {
+            category = new DefaultMutableTreeNode("Siblings");
+            top.add(category);
+            for (int i = 0; i < member.relation.getSiblings().size(); i++) {
+                person1 = new DefaultMutableTreeNode(new Person(member.relation.getSiblings().get(i)));
+                category.add(person1);
+                // print sibling's spouse
+                if (member.relation.getSiblings().get(i).relation.getSpouse() != null) {
+                    category = new DefaultMutableTreeNode("Spouse");
+                    person1.add(category);
+                    person2 = new DefaultMutableTreeNode(new Person(member.relation.getSiblings().get(i).relation.getSpouse()));
+                    category.add(person2);
+                }
+                // print sibling's children
+                if (member.relation.getSiblings().get(i).relation.getChildren().size() != 0) {
+                    category1 = new DefaultMutableTreeNode("Children");
+                    person1.add(category1);
+                    for (int t = 0; t < member.relation.getSiblings().get(i).relation.getChildren().size(); t++) {
+                        person2 = new DefaultMutableTreeNode(new Person(member.relation.getSiblings().get(i).relation.getChildren().get(t)));
+                        category.add(person2);
+                    }
+                }
+            }
+        }
+        // print children
+        if (member.relation.getChildren().size() != 0) {
+            category1 = new DefaultMutableTreeNode("Children");
+            top.add(category1);
+            for (int i = 0; i < member.relation.getChildren().size(); i++) {
+                person1 = new DefaultMutableTreeNode(new Person(member.relation.getChildren().get(i)));
+                category1.add(person1);
+                // print children's spouse
+                if (member.relation.getChildren().get(i).relation.getSpouse() != null) {
+                    category = new DefaultMutableTreeNode("Spouse");
+                    person1.add(category);
+                    person2 = new DefaultMutableTreeNode(new Person(member.relation.getChildren().get(i).relation.getSpouse()));
+                    category.add(person2);
+                }
+                // print grandchildren
+                if (member.relation.getChildren().get(i).relation.getChildren().size() != 0) {
+                    category = new DefaultMutableTreeNode("Children");
+                    person1.add(category);
+                    for (int t = 0; t < member.relation.getChildren().get(i).relation.getChildren().size(); t++) {
+                        person2 = new DefaultMutableTreeNode(new Person(member.relation.getChildren().get(i).relation.getChildren().get(t)));
+                        category.add(person2);
+                    }
+                }
+            }
+        }
+
+        // print uncles
+        if (Relation.getUncles(root).size() != 0) {
+            category = new DefaultMutableTreeNode("Uncles");
+            top.add(category);
+            for (int i = 0; i < Relation.getUncles(root).size(); i++) {
+                person = new DefaultMutableTreeNode(new Person(Relation.getUncles(root).get(i)));
+                category.add(person);
+
+                // print uncle's spouse
+                if (Relation.getUncles(root).get(i).relation.getSpouse() != null) {
+                    category = new DefaultMutableTreeNode("Spouse");
+                    person1.add(category);
+                    person2 = new DefaultMutableTreeNode(new Person(Relation.getUncles(root).get(i).relation.getSpouse()));
+                    category.add(person2);
+                }
+                // print uncle's children - cousins
+                if (Relation.getUncles(root).get(i).relation.getChildren().size() != 0) {
+                    category = new DefaultMutableTreeNode("Children");
+                    person1.add(category);
+                    for (int t = 0; t < Relation.getUncles(root).get(i).relation.getChildren().size(); t++) {
+                        person2 = new DefaultMutableTreeNode(new Person(Relation.getUncles(root).get(i).relation.getChildren().get(t)));
+                        category.add(person2);
+                    }
+                }
+            }
+        }
+        // print aunts
+        if (Relation.getAunts(root).size() != 0) {
+            category = new DefaultMutableTreeNode("Aunts");
+            top.add(category);
+            for (int i = 0; i < Relation.getAunts(root).size(); i++) {
+                person = new DefaultMutableTreeNode(new Person(Relation.getAunts(root).get(i)));
+                category.add(person);
+                // print aunt's spouse
+                if (Relation.getAunts(root).get(i).relation.getSpouse() != null) {
+                    category = new DefaultMutableTreeNode("Spouse");
+                    person1.add(category);
+                    person2 = new DefaultMutableTreeNode(new Person(Relation.getAunts(root).get(i).relation.getSpouse()));
+                    category.add(person2);
+                }
+                // print aunt's children - cousins
+                if (Relation.getAunts(root).get(i).relation.getChildren().size() != 0) {
+                    category = new DefaultMutableTreeNode("Children");
+                    person1.add(category);
+                    for (int t = 0; t < Relation.getAunts(root).get(i).relation.getChildren().size(); t++) {
+                        person2 = new DefaultMutableTreeNode(new Person(Relation.getAunts(root).get(i).relation.getChildren().get(t)));
+                        category.add(person2);
+                    }
+                }
+            }
+        }
+        // print cousins
+        if (Relation.getCousins(root).size() != 0) {
+            category = new DefaultMutableTreeNode("Cousins");
+            top.add(category);
+            for (int i = 0; i < Relation.getCousins(root).size(); i++) {
+                person = new DefaultMutableTreeNode(new Person(Relation.getCousins(root).get(i)));
+                category.add(person);
+                // print cousin's spouse
+                if (Relation.getCousins(root).get(i).relation.getSpouse() != null) {
+                    category = new DefaultMutableTreeNode("Spouse");
+                    person1.add(category);
+                    person2 = new DefaultMutableTreeNode(new Person(Relation.getCousins(root).get(i).relation.getSpouse()));
+                    category.add(person2);
+                }
+                // print cousin's children
+                if (Relation.getCousins(root).get(i).relation.getChildren().size() != 0) {
+                    category = new DefaultMutableTreeNode("Children");
+                    person1.add(category);
+                    for (int t = 0; t < Relation.getCousins(root).get(i).relation.getChildren().size(); t++) {
+                        person2 = new DefaultMutableTreeNode(new Person(Relation.getCousins(root).get(i).relation.getChildren().get(t)));
+                        category.add(person2);
+                    }
+                }
+            }
         }
     }
 }
-
+class InvalidPropertyException extends Exception{
+    public InvalidPropertyException(String message) {
+        super(message);
+    }
+}
