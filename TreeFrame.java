@@ -68,8 +68,24 @@ public class TreeFrame extends JFrame {
         scrollPane.repaint();
         revalidate();
     }
-    public void setMergedTree(){setTitle("Merge Trees");}
-    public void setLoadedTree(){setTitle("Load A Tree");}
+    public void setMergedTree(){
+        setTitle("Merge Trees");
+        JPanel panel = new JPanel();
+        JButton mergeBtn = new JButton("Load Tree");
+        panel.add(mergeBtn);
+        scrollPane.setViewportView(panel);
+
+        mergeBtn.addActionListener(e -> {});
+    }
+    public void setLoadedTree(){
+        setTitle("Load A Tree");
+        JPanel panel = new JPanel();
+        JButton loadBtn = new JButton("Load Tree");
+        panel.add(loadBtn);
+        scrollPane.setViewportView(panel);
+
+        loadBtn.addActionListener(e -> {});
+    }
 
     // terminates the program
     public void exit(){

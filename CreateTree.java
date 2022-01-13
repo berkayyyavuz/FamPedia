@@ -59,6 +59,8 @@ public class CreateTree extends JPanel {
         // save button
         JButton saveButton = new JButton("Add Member");
         JButton btnTree = new JButton("Create Your Family Tree");
+        JButton exportBtn = new JButton("Export Tree");
+        JButton photoBtn = new JButton("Take Photo");
 
         JPanel space = new JPanel(); // to create a space
 
@@ -88,18 +90,23 @@ public class CreateTree extends JPanel {
             splitPane.revalidate();
             treePanel.revalidate();
         });
-/*jLabel4 = new JLabel("<html><body>Select a label below, then click on \"Add\" button.<br>" +
-                "Then, click on \"Save\" button to finish.</body></html>");*/
+
         btnTree.addActionListener(e -> {
             JPanel boxPanel = new JPanel();
+            JPanel btnPanel = new JPanel();
+            JPanel btnPanel1 = new JPanel();
             JPanel lblPanel = new JPanel();
-            newMemberPanel = new JPanel(new GridLayout(2,0));
+            newMemberPanel = new JPanel(new GridLayout(4,0));
             JLabel lblExp = new JLabel("<html><body>Select a family <br>member to see <br>relations:</body></html>");
             lblExp.setFont(new Font("Arial", Font.ITALIC, 14));
             lblPanel.add(lblExp);
             boxPanel.add(boxMembers);
+            btnPanel.add(exportBtn);
+            btnPanel1.add(photoBtn);
             newMemberPanel.add(lblPanel);
             newMemberPanel.add(boxPanel);
+            newMemberPanel.add(btnPanel);
+            newMemberPanel.add(btnPanel1);
 
             // add a check box to center a member in the tree
             boxMembers.addActionListener(e1 -> {
@@ -111,7 +118,7 @@ public class CreateTree extends JPanel {
                 treePanel = new JPanel();
                 // call PrintTree to show the tree at the point of view of selected member
                 treePanel.add(new PrintTree(relative));
-                relative.printRelations();
+                Relation.listAllRelations(relative);
                 splitPane.setRightComponent(treePanel);
                 splitPane.revalidate();
                 treePanel.revalidate();
@@ -182,7 +189,7 @@ public class CreateTree extends JPanel {
                 treePanel.add(lblPanel);
                 break;
             case 3:  // child
-                Relation.addChild(member, relative);
+                Relation.addChild( member, relative);
                 report.setText(relative.name + " is set as a child of " + member.name);
                 lblPanel.add(report);
                 treePanel.add(lblPanel);
@@ -314,7 +321,7 @@ class PrintTree extends JPanel implements TreeSelectionListener {
         Member member = root; // initially
 
         // print grandfathers
-        if (member.relation.getGrandFathers(root).size() != 0) {
+        if (Relation.listGrandFathers(root)) {
             category = new DefaultMutableTreeNode("GrandFathers");
             top.add(category);
             for (int i = 0; i < member.relation.getGrandFathers(root).size(); i++) {
@@ -322,13 +329,15 @@ class PrintTree extends JPanel implements TreeSelectionListener {
                 category.add(person);
                 // print grandfather's spouse
                 if (member.relation.getGrandFathers(root).get(i).relation.getSpouse() != null) {
+                    category = new DefaultMutableTreeNode("Spouse");
+                    person.add(category);
                     person1 = new DefaultMutableTreeNode(new Person(member.relation.getGrandFathers(root).get(i).relation.getSpouse()));
-                    person.add(person1);
+                    category.add(person1);
                 }
                 // print children
                 if (member.relation.getGrandFathers(root).get(i).relation.getChildren().size() != 0) {
                     category = new DefaultMutableTreeNode("Children");
-                    person1.add(category);
+                    person.add(category);
                     for (int t = 0; t < member.relation.getGrandFathers(root).get(i).relation.getChildren().size(); t++) {
                         person2 = new DefaultMutableTreeNode(new Person(member.relation.getGrandFathers(root).get(i).relation.getChildren().get(t)));
                         category.add(person2);
@@ -361,10 +370,10 @@ class PrintTree extends JPanel implements TreeSelectionListener {
                 category.add(person1);
                 // print sibling's spouse
                 if (member.relation.getSiblings().get(i).relation.getSpouse() != null) {
-                    category = new DefaultMutableTreeNode("Spouse");
-                    person1.add(category);
+                    category1 = new DefaultMutableTreeNode("Spouse");
+                    person1.add(category1);
                     person2 = new DefaultMutableTreeNode(new Person(member.relation.getSiblings().get(i).relation.getSpouse()));
-                    category.add(person2);
+                    category1.add(person2);
                 }
                 // print sibling's children
                 if (member.relation.getSiblings().get(i).relation.getChildren().size() != 0) {
@@ -372,7 +381,7 @@ class PrintTree extends JPanel implements TreeSelectionListener {
                     person1.add(category1);
                     for (int t = 0; t < member.relation.getSiblings().get(i).relation.getChildren().size(); t++) {
                         person2 = new DefaultMutableTreeNode(new Person(member.relation.getSiblings().get(i).relation.getChildren().get(t)));
-                        category.add(person2);
+                        category1.add(person2);
                     }
                 }
             }
@@ -404,7 +413,7 @@ class PrintTree extends JPanel implements TreeSelectionListener {
         }
 
         // print uncles
-        if (Relation.getUncles(root).size() != 0) {
+        if (Relation.listUncles(root)) {
             category = new DefaultMutableTreeNode("Uncles");
             top.add(category);
             for (int i = 0; i < Relation.getUncles(root).size(); i++) {
@@ -414,14 +423,14 @@ class PrintTree extends JPanel implements TreeSelectionListener {
                 // print uncle's spouse
                 if (Relation.getUncles(root).get(i).relation.getSpouse() != null) {
                     category = new DefaultMutableTreeNode("Spouse");
-                    person1.add(category);
+                    person.add(category);
                     person2 = new DefaultMutableTreeNode(new Person(Relation.getUncles(root).get(i).relation.getSpouse()));
                     category.add(person2);
                 }
                 // print uncle's children - cousins
                 if (Relation.getUncles(root).get(i).relation.getChildren().size() != 0) {
                     category = new DefaultMutableTreeNode("Children");
-                    person1.add(category);
+                    person.add(category);
                     for (int t = 0; t < Relation.getUncles(root).get(i).relation.getChildren().size(); t++) {
                         person2 = new DefaultMutableTreeNode(new Person(Relation.getUncles(root).get(i).relation.getChildren().get(t)));
                         category.add(person2);
@@ -430,7 +439,7 @@ class PrintTree extends JPanel implements TreeSelectionListener {
             }
         }
         // print aunts
-        if (Relation.getAunts(root).size() != 0) {
+        if (Relation.listAunts(root)) {
             category = new DefaultMutableTreeNode("Aunts");
             top.add(category);
             for (int i = 0; i < Relation.getAunts(root).size(); i++) {
@@ -439,14 +448,14 @@ class PrintTree extends JPanel implements TreeSelectionListener {
                 // print aunt's spouse
                 if (Relation.getAunts(root).get(i).relation.getSpouse() != null) {
                     category = new DefaultMutableTreeNode("Spouse");
-                    person1.add(category);
+                    person.add(category);
                     person2 = new DefaultMutableTreeNode(new Person(Relation.getAunts(root).get(i).relation.getSpouse()));
                     category.add(person2);
                 }
                 // print aunt's children - cousins
                 if (Relation.getAunts(root).get(i).relation.getChildren().size() != 0) {
                     category = new DefaultMutableTreeNode("Children");
-                    person1.add(category);
+                    person.add(category);
                     for (int t = 0; t < Relation.getAunts(root).get(i).relation.getChildren().size(); t++) {
                         person2 = new DefaultMutableTreeNode(new Person(Relation.getAunts(root).get(i).relation.getChildren().get(t)));
                         category.add(person2);
@@ -455,7 +464,7 @@ class PrintTree extends JPanel implements TreeSelectionListener {
             }
         }
         // print cousins
-        if (Relation.getCousins(root).size() != 0) {
+        if (Relation.listCousins(root)) {
             category = new DefaultMutableTreeNode("Cousins");
             top.add(category);
             for (int i = 0; i < Relation.getCousins(root).size(); i++) {
@@ -464,14 +473,14 @@ class PrintTree extends JPanel implements TreeSelectionListener {
                 // print cousin's spouse
                 if (Relation.getCousins(root).get(i).relation.getSpouse() != null) {
                     category = new DefaultMutableTreeNode("Spouse");
-                    person1.add(category);
+                    person.add(category);
                     person2 = new DefaultMutableTreeNode(new Person(Relation.getCousins(root).get(i).relation.getSpouse()));
                     category.add(person2);
                 }
                 // print cousin's children
                 if (Relation.getCousins(root).get(i).relation.getChildren().size() != 0) {
                     category = new DefaultMutableTreeNode("Children");
-                    person1.add(category);
+                    person.add(category);
                     for (int t = 0; t < Relation.getCousins(root).get(i).relation.getChildren().size(); t++) {
                         person2 = new DefaultMutableTreeNode(new Person(Relation.getCousins(root).get(i).relation.getChildren().get(t)));
                         category.add(person2);
