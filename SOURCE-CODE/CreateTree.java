@@ -1,9 +1,12 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -14,6 +17,10 @@ public class CreateTree extends JPanel {
     JRadioButton btn1, btn2;
     JComboBox boxMembers, boxRelations;
     ArrayList<Member> members;
+    String msg = "";
+    static JButton exportBtn;
+    static JButton photoBtn;
+    int counter = 0;
 
     public void setMainPanel() {
         splitPane = new JSplitPane();
@@ -59,8 +66,8 @@ public class CreateTree extends JPanel {
         // save button
         JButton saveButton = new JButton("Add Member");
         JButton btnTree = new JButton("Create Your Family Tree");
-        JButton exportBtn = new JButton("Export Tree");
-        JButton photoBtn = new JButton("Take Photo");
+        exportBtn = new JButton("Export Tree");
+        photoBtn = new JButton("Take Photo");
 
         JPanel space = new JPanel(); // to create a space
 
@@ -101,15 +108,18 @@ public class CreateTree extends JPanel {
             lblExp.setFont(new Font("Arial", Font.ITALIC, 14));
             lblPanel.add(lblExp);
             boxPanel.add(boxMembers);
-            btnPanel.add(exportBtn);
+            //btnPanel.add(exportBtn);
             btnPanel1.add(photoBtn);
+            photoBtn.setEnabled(false);
             newMemberPanel.add(lblPanel);
             newMemberPanel.add(boxPanel);
             newMemberPanel.add(btnPanel);
             newMemberPanel.add(btnPanel1);
 
+
             // add a check box to center a member in the tree
             boxMembers.addActionListener(e1 -> {
+                photoBtn.setEnabled(true);
                 Member relative = new Member("", 'U');
                 for(int i=0;i< members.size();i++){
                     if(boxMembers.getSelectedIndex() == i)
@@ -124,6 +134,20 @@ public class CreateTree extends JPanel {
                 treePanel.revalidate();
             });
 
+            // take a screenshot of the complete tree
+            photoBtn.addActionListener(e1 -> {
+                try {
+                    Container c = treePanel;
+                    BufferedImage im = new BufferedImage(c.getWidth(), c.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    c.paint(im.getGraphics());
+
+                    ImageIO.write(im, "PNG", new File("Family_Tree.png"));
+                    JDialog msg = new JDialog();
+                    JOptionPane.showMessageDialog(msg, "Family tree screenshot has taken successfully!");
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            });
             splitPane.setLeftComponent(newMemberPanel);
             splitPane.revalidate();
             newMemberPanel.revalidate();
@@ -166,6 +190,8 @@ public class CreateTree extends JPanel {
             boxMembers.addItem(spouse.name);  // add member names into the combo box
             System.out.println(spouse.name + " is added.");
             report.setText(spouse.name + " is set as spouse of " + member.name);
+            msg += "+Relation.setSpouse("+ member + "," + spouse +");\n";
+            counter++;
             lblPanel.add(report);
             treePanel.add(lblPanel);
         }
@@ -185,18 +211,24 @@ public class CreateTree extends JPanel {
             case 2:  // father
                 Relation.addParent(member, relative);
                 report.setText(relative.name + " is set as a parent of " + member.name);
+                msg += "+Relation.addParent("+ member + "," + relative +");\n";
+                counter++;
                 lblPanel.add(report);
                 treePanel.add(lblPanel);
                 break;
             case 3:  // child
                 Relation.addChild( member, relative);
                 report.setText(relative.name + " is set as a child of " + member.name);
+                msg += "+Relation.addChild("+ member + "," + relative +");\n";
+                counter++;
                 lblPanel.add(report);
                 treePanel.add(lblPanel);
                 break;
             case 4:  // sibling
                 Relation.addSibling(member, relative);
                 report.setText(relative.name + " is set as a sibling of " + member.name);
+                msg += "+Relation.addSibling("+ member + "," + relative +");\n";
+                counter++;
                 lblPanel.add(report);
                 treePanel.add(lblPanel);
                 break;
@@ -255,7 +287,6 @@ class PrintTree extends JPanel implements TreeSelectionListener {
         //Add the scroll panes to a split pane.
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setTopComponent(treeView);
-        splitPane.setBottomComponent(htmlView);
 
         Dimension minimumSize = new Dimension(100, 50);
         htmlView.setMinimumSize(minimumSize);
